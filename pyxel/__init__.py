@@ -9,23 +9,21 @@ import string
 __version__ = '0.1.0'
 
 
-def _create_alfabet():
+def _create_alphabet():
     """
-        Creates a dictionary with one number of each letter from a to zz
+        Creates a dictionary with one number for each letter from a to zz
     """
-    alfa = list(string.lowercase)
-    beta = alfa + [x + y for x in alfa for y in alfa]
+    alpha = list(string.lowercase)
+    beta = alpha + [x + y for x in alpha for y in alpha]
 
-    alfa_dict = dict(zip(beta, range(len(beta))))
-    return alfa_dict
+    alpha_dict = dict(zip(beta, range(len(beta))))
+    return alpha_dict
+
 
 def _decode_range(xls_range):
-    """
-        Transform the input range (i.e 'A1:B1') into integers
-    """
 
-    #Create the alfabet dict
-    alfabet = _create_alfabet()
+    #Create the alphabet dict
+    alphabet = _create_alphabet()
 
     #Divide the provided range
     start, end = xls_range.lower().split(":")
@@ -33,6 +31,7 @@ def _decode_range(xls_range):
     #Use regex to separte string from numeric string
     group_start = re.findall('\d+|\D+', start)
     group_end = re.findall('\d+|\D+', end)
+
    #Treat bad inputs
     if group_start[0].isdigit():
         raise TypeError("The first part of the range must be a letter")
@@ -47,24 +46,15 @@ def _decode_range(xls_range):
     if len(group_end) > 2:
         raise TypeError("Bad range Input!")
 
-
-
-
     #Get the number associated with the string
     try:
-        string_start = alfabet[group_start[0]]
-        string_end =  alfabet[group_end[0]]
+        string_start = alphabet[group_start[0]]
+        string_end = alphabet[group_end[0]]
     except KeyError:
         raise KeyError("The range providede is too big!")
 
-    #Get the number the original string
+    #Get the number of the original string
     numeric_start = int(group_start[1])
     numeric_end = int(group_end[1])
 
-
     return [string_start, numeric_start, string_end, numeric_end]
-
-
-
-
-
