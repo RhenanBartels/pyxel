@@ -20,6 +20,9 @@ def _create_alfabet():
     return alfa_dict
 
 def _decode_range(xls_range):
+    """
+        Transform the input range (i.e 'A1:B1') into integers
+    """
 
     #Create the alfabet dict
     alfabet = _create_alfabet()
@@ -43,6 +46,7 @@ def _decode_range(xls_range):
         raise TypeError("Band range Input!")
     if len(group_end) > 2:
         raise TypeError("Bad range Input!")
+
 
 
 
