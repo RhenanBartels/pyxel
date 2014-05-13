@@ -6,12 +6,12 @@ import pyxel
 
 
 class TestReadXls(unittest.TestCase):
-    def test_create_alfabet(self):
+    def test_create_alphabet(self):
         reference = [['a', 0], ['b', 1], ['h', 7]]
-        alfa_dict = pyxel._create_alfabet()
-        self.assertEquals(reference[0][1], alfa_dict[reference[0][0]])
-        self.assertEquals(reference[1][1], alfa_dict[reference[1][0]])
-        self.assertEquals(reference[2][1], alfa_dict[reference[2][0]])
+        alpha_dict = pyxel._create_alphabet()
+        self.assertEquals(reference[0][1], alpha_dict[reference[0][0]])
+        self.assertEquals(reference[1][1], alpha_dict[reference[1][0]])
+        self.assertEquals(reference[2][1], alpha_dict[reference[2][0]])
 
     def test_decode_range(self):
         xlsrange = "A1:B1"
@@ -39,7 +39,7 @@ class TesteBadInputsReadXls(unittest.TestCase):
         self.assertRaises(TypeError, pyxel._decode_range, numeric_input_two)
         self.assertRaises(TypeError, pyxel._decode_range, numeric_input_three)
 
-    def test_two_alfa_inputs(self):
+    def test_two_alpha_inputs(self):
         string_input = "AA:B1"
         string_input_two = "AA:BB"
         string_input_three = "ZZ:B-9"
