@@ -62,5 +62,12 @@ class TesteBadInputsReadXls(unittest.TestCase):
         bad_char_input = "@23:b45"
         self.assertRaises(KeyError, pyxel._decode_range, bad_char_input)
 
+    def test_unorderd_alpha(self):
+        unorded = "C2:A1"
+        reference = [2, 2, 0, 1]
+        result = pyxel._decode_range(unorded)
+        self.assertEquals(result, reference)
+
 if __name__ == "__main__":
+
     unittest.main()

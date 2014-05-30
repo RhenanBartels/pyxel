@@ -48,8 +48,8 @@ def _decode_range(xls_range):
 
     #Get the number associated with the string
     try:
-        string_start = alphabet[group_start[0]]
-        string_end = alphabet[group_end[0]]
+        string_start = min([alphabet[group_start[0]], alphabet[group_end[0]]])
+        string_end = max([alphabet[group_start[0]], alphabet[group_end[0]]])
     except KeyError:
         raise KeyError("The range providede is too big!")
 
