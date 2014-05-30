@@ -3,6 +3,7 @@
 
 import unittest
 import pyxel
+from xlrd import XLRDError
 
 
 class TestReadXls(unittest.TestCase):
@@ -64,9 +65,29 @@ class TesteBadInputsReadXls(unittest.TestCase):
 
     def test_unorderd_alpha(self):
         unorded = "C2:A2"
-        reference = [0, 2, 2, 2]
+        reference = []
         result = pyxel._decode_range(unorded)
         self.assertEquals(result, reference)
+
+    def test_without_semicolon(self):
+        input = "A2B3"
+        self.assertRaises(ValueError, pyxel._decode_range, input)
+
+
+class TestFiles(unittest.TestCase):
+    def test_existing_file(self):
+        filename = "rhenan.xls"
+        self.assertRaises(IOError, pyxel._read_data, filename, None, None)
+
+    def test_sheet_index(self):
+        filename = "test1.xls"
+        sheet = 1
+        self.assertRaises(IndexError, pyxel._read_data, filename, None, sheet)
+
+    def test_sheet_by_name(self):
+        filename = "test1.xls"
+        sheet = "test"
+        self.assertRaises(XLRDError, pyxel._read_data, filename, None, sheet)
 
 if __name__ == "__main__":
 
