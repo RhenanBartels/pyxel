@@ -89,6 +89,18 @@ class TestFiles(unittest.TestCase):
         sheet = "test"
         self.assertRaises(XLRDError, pyxel._read_data, filename, None, sheet)
 
+class TestData(unittest.TestCase):
+    def test_values(self):
+        filename = "test1.xls"
+        xlsrange ="A1:A6"
+        reference = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+        result = pyxel._read_data(filename, xlsrange)
+        self.assertEquals(reference, result)
+
+    def test_values_format(self):
+        pass
+
+
 if __name__ == "__main__":
 
     unittest.main()

@@ -82,3 +82,17 @@ def _read_data(filename, xlsrange, sheet=0):
             workbook = fobj.sheet_by_name(sheet)
         except XLRDError:
             raise XLRDError("There is no such sheet!")
+
+    range_values = _decode_range(xlsrange)
+
+    rows = range(range_values[1] - 1, range_values[-1])
+    columns = range(range_values[0], range_values[2] + 1)
+
+    data = []
+
+    for col in columns:
+        for row in rows:
+            value = workbook.cell_value(row, col)
+            data.append(value)
+
+    return data
