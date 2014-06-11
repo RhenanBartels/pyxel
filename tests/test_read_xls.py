@@ -3,6 +3,7 @@
 
 import unittest
 import pyxel
+import numpy as np
 from xlrd import XLRDError
 
 
@@ -77,25 +78,49 @@ class TesteBadInputsReadXls(unittest.TestCase):
 class TestFiles(unittest.TestCase):
     def test_existing_file(self):
         filename = "rhenan.xls"
-        self.assertRaises(IOError, pyxel._read_data, filename, None, None)
+        self.assertRaises(IOError, pyxel.xlsread, filename, None, None)
 
     def test_sheet_index(self):
         filename = "test1.xls"
         sheet = 1
-        self.assertRaises(IndexError, pyxel._read_data, filename, None, sheet)
+        self.assertRaises(IndexError, pyxel.xlsread, filename, None, sheet)
 
     def test_sheet_by_name(self):
         filename = "test1.xls"
         sheet = "test"
-        self.assertRaises(XLRDError, pyxel._read_data, filename, None, sheet)
+        self.assertRaises(XLRDError, pyxel.xlsread, filename, None, sheet)
+
 
 class TestData(unittest.TestCase):
     def test_values(self):
         filename = "test1.xls"
-        xlsrange ="A1:A6"
+        xlsrange = "A1:A6"
         reference = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-        result = pyxel._read_data(filename, xlsrange)
+        result = pyxel.xlsread(filename, xlsrange)
         self.assertEquals(reference, result)
+
+    def test_empty_cells(self):
+        filename = "test3.xls"
+        xlsrange = "A1:B3"
+        reference = [1.0, 2.0, 3.0, None, 5.0, 6.0]
+        result = pyxel.xlsread(filename, xlsrange)
+        self.assertEquals(reference, result)
+
+    def test_read_columns(self):
+        filename = "test2.xls"
+        xlsrange = "A1:B3"
+        reference = [1.0, 4.0, 2.0, 5.0, 3.0, 6.0]
+        result = pyxel.xlsread(filename, xlsrange, read_by_column=False)
+        self.assertEquals(reference, result)
+
+    def test_output_format(self):
+        filename = "test4.xls"
+        xlsrange = "A1:B7"
+        reference = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0,
+                              None, None, None], dtype=np.float)
+        result = pyxel.xlsread(filename, xlsrange, output_format="numpy")
+        self.assertTrue(((reference == result) | (np.isnan(reference)
+                                                  & np.isnan(result))).all())
 
     def test_values_format(self):
         pass

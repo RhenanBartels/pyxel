@@ -5,6 +5,8 @@ import re
 import xlrd
 import xlwt
 import string
+import warnings
+import numpy as np
 from xlrd import XLRDError
 
 __version__ = '0.1.0'
@@ -65,8 +67,12 @@ def _decode_range(xls_range):
 
     return [string_start, numeric_start, string_end, numeric_end]
 
+def _convert_to_matrix(list_, row):
+    return [list_[i: i + row] for i in range(0, len(list_), row)]
 
-def _read_data(filename, xlsrange, sheet=0):
+
+def xlsread(filename, xlsrange, sheet=0, read_by_column=True,
+            output_format="list", keep_format=False):
     try:
         fobj = xlrd.open_workbook(filename)
     except IOError:
@@ -89,10 +95,38 @@ def _read_data(filename, xlsrange, sheet=0):
     columns = range(range_values[0], range_values[2] + 1)
 
     data = []
+    if read_by_column:
+        for col in columns:
+            for row in rows:
+                try:
+                    value = workbook.cell_value(row, col)
+                except IndexError:
+                    warnings.warn("Range with empties cells!")
+                    continue
 
-    for col in columns:
+                if value:
+                    data.append(value)
+                else:
+                    data.append(None)
+    else:
         for row in rows:
-            value = workbook.cell_value(row, col)
-            data.append(value)
+            for col in columns:
+                try:
+                    value = workbook.cell_value(row, col)
+                    print value
+                except IndexError:
+                    warnings.warn("Range with empties cells!")
+                    continue
+
+                if value:
+                    data.append(value)
+                else:
+                    data.append(None)
+
+    if keep_format:
+        data = _convert_to_matrix(data, len(rows))
+
+    if output_format == "numpy":
+        data = np.array(data, dtype=np.float)
 
     return data
