@@ -72,61 +72,68 @@ def _convert_to_matrix(list_, row):
 
 
 def xlsread(filename, xlsrange, sheet=0, read_by_column=True,
-            output_format="list", keep_format=False):
-    try:
-        fobj = xlrd.open_workbook(filename)
-    except IOError:
-        raise IOError("File does not exist!")
+            keep_format=False, output_format='list'):
 
-    if isinstance(sheet, int):
+    if not isinstance(output_format, basestring):
+        raise TypeError("output_format must be a string!")
+    if output_format != "list" or output_format != "numpy":
+
         try:
-            workbook = fobj.sheet_by_index(sheet)
-        except IndexError:
-            raise IndexError("There is no such sheet!")
-    elif isinstance(sheet, basestring):
-        try:
-            workbook = fobj.sheet_by_name(sheet)
-        except XLRDError:
-            raise XLRDError("There is no such sheet!")
+            fobj = xlrd.open_workbook(filename)
+        except IOError:
+            raise IOError("File does not exist!")
 
-    range_values = _decode_range(xlsrange)
+        if isinstance(sheet, int):
+            try:
+                workbook = fobj.sheet_by_index(sheet)
+            except IndexError:
+                raise IndexError("There is no such sheet!")
+        elif isinstance(sheet, basestring):
+            try:
+                workbook = fobj.sheet_by_name(sheet)
+            except XLRDError:
+                raise XLRDError("There is no such sheet!")
 
-    rows = range(range_values[1] - 1, range_values[-1])
-    columns = range(range_values[0], range_values[2] + 1)
+        range_values = _decode_range(xlsrange)
 
-    data = []
-    if read_by_column:
-        for col in columns:
-            for row in rows:
-                try:
-                    value = workbook.cell_value(row, col)
-                except IndexError:
-                    warnings.warn("Range with empties cells!")
-                    continue
+        rows = range(range_values[1] - 1, range_values[-1])
+        columns = range(range_values[0], range_values[2] + 1)
 
-                if value:
-                    data.append(value)
-                else:
-                    data.append(None)
-    else:
-        for row in rows:
+        data = []
+        if read_by_column:
             for col in columns:
-                try:
-                    value = workbook.cell_value(row, col)
-                    print value
-                except IndexError:
-                    warnings.warn("Range with empties cells!")
-                    continue
+                for row in rows:
+                    try:
+                        value = workbook.cell_value(row, col)
+                    except IndexError:
+                        warnings.warn("Range with empties cells!")
+                        continue
 
-                if value:
-                    data.append(value)
-                else:
-                    data.append(None)
+                    if value:
+                        data.append(value)
+                    else:
+                        data.append(None)
+        else:
+            for row in rows:
+                for col in columns:
+                    try:
+                        value = workbook.cell_value(row, col)
+                        print value
+                    except IndexError:
+                        warnings.warn("Range with empties cells!")
+                        continue
 
-    if keep_format:
-        data = _convert_to_matrix(data, len(rows))
+                    if value:
+                        data.append(value)
+                    else:
+                        data.append(None)
 
-    if output_format == "numpy":
-        data = np.array(data, dtype=np.float)
+        if keep_format:
+            data = _convert_to_matrix(data, len(rows))
 
-    return data
+        if output_format == "numpy":
+            data = np.array(data, dtype=np.float)
+
+        return data
+    else:
+        raise NameError("output_format must be 'list' or 'numpy'!")

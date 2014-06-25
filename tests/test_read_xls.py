@@ -125,6 +125,16 @@ class TestData(unittest.TestCase):
     def test_values_format(self):
         pass
 
+    def test_output_format_two(self):
+        filename = "test1.xls"
+        xlsrange = "A1:A6"
+        sheet = 0
+        read_by_column = True
+        keep_format = True
+        output_f = 10
+        self.assertRaises(TypeError, pyxel.xlsread, filename, xlsrange,
+                          sheet, read_by_column, keep_format, output_f)
+
 
 if __name__ == "__main__":
 
