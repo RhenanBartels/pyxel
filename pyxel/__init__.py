@@ -76,64 +76,63 @@ def xlsread(filename, xlsrange, sheet=0, read_by_column=True,
 
     if not isinstance(output_format, basestring):
         raise TypeError("output_format must be a string!")
-    if output_format != "list" or output_format != "numpy":
-
-        try:
-            fobj = xlrd.open_workbook(filename)
-        except IOError:
-            raise IOError("File does not exist!")
-
-        if isinstance(sheet, int):
-            try:
-                workbook = fobj.sheet_by_index(sheet)
-            except IndexError:
-                raise IndexError("There is no such sheet!")
-        elif isinstance(sheet, basestring):
-            try:
-                workbook = fobj.sheet_by_name(sheet)
-            except XLRDError:
-                raise XLRDError("There is no such sheet!")
-
-        range_values = _decode_range(xlsrange)
-
-        rows = range(range_values[1] - 1, range_values[-1])
-        columns = range(range_values[0], range_values[2] + 1)
-
-        data = []
-        if read_by_column:
-            for col in columns:
-                for row in rows:
-                    try:
-                        value = workbook.cell_value(row, col)
-                    except IndexError:
-                        warnings.warn("Range with empties cells!")
-                        continue
-
-                    if value:
-                        data.append(value)
-                    else:
-                        data.append(None)
-        else:
-            for row in rows:
-                for col in columns:
-                    try:
-                        value = workbook.cell_value(row, col)
-                        print value
-                    except IndexError:
-                        warnings.warn("Range with empties cells!")
-                        continue
-
-                    if value:
-                        data.append(value)
-                    else:
-                        data.append(None)
-
-        if keep_format:
-            data = _convert_to_matrix(data, len(rows))
-
-        if output_format == "numpy":
-            data = np.array(data, dtype=np.float)
-
-        return data
-    else:
+    if output_format not in ["list", "numpy"]:
         raise NameError("output_format must be 'list' or 'numpy'!")
+
+    try:
+        fobj = xlrd.open_workbook(filename)
+    except IOError:
+        raise IOError("File does not exist!")
+
+    if isinstance(sheet, int):
+        try:
+            workbook = fobj.sheet_by_index(sheet)
+        except IndexError:
+            raise IndexError("There is no such sheet!")
+    elif isinstance(sheet, basestring):
+        try:
+            workbook = fobj.sheet_by_name(sheet)
+        except XLRDError:
+            raise XLRDError("There is no such sheet!")
+
+    range_values = _decode_range(xlsrange)
+
+    rows = range(range_values[1] - 1, range_values[-1])
+    columns = range(range_values[0], range_values[2] + 1)
+
+    data = []
+    if read_by_column:
+        for col in columns:
+            for row in rows:
+                try:
+                    value = workbook.cell_value(row, col)
+                except IndexError:
+                    warnings.warn("Range with empties cells!")
+                    continue
+
+                if value:
+                    data.append(value)
+                else:
+                    data.append(None)
+    else:
+        for row in rows:
+            for col in columns:
+                try:
+                    value = workbook.cell_value(row, col)
+                    print value
+                except IndexError:
+                    warnings.warn("Range with empties cells!")
+                    continue
+
+                if value:
+                    data.append(value)
+                else:
+                    data.append(None)
+
+    if keep_format:
+        data = _convert_to_matrix(data, len(rows))
+
+    if output_format == "numpy":
+        data = np.array(data, dtype=np.float)
+
+    return data
