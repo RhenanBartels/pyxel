@@ -67,6 +67,7 @@ def _decode_range(xls_range):
 
     return [string_start, numeric_start, string_end, numeric_end]
 
+
 def _convert_to_matrix(list_, row):
     return [list_[i: i + row] for i in range(0, len(list_), row)]
 
@@ -76,7 +77,7 @@ def xlsread(filename, xlsrange, sheet=0, read_by_column=True,
 
     if not isinstance(output_format, basestring):
         raise TypeError("output_format must be a string!")
-    if output_format not in ["list", "numpy"]:
+    if not (output_format == 'list' or output_format == 'numpy'):
         raise NameError("output_format must be 'list' or 'numpy'!")
 
     try:
@@ -96,6 +97,7 @@ def xlsread(filename, xlsrange, sheet=0, read_by_column=True,
             raise XLRDError("There is no such sheet!")
 
     range_values = _decode_range(xlsrange)
+    print range_values
 
     rows = range(range_values[1] - 1, range_values[-1])
     columns = range(range_values[0], range_values[2] + 1)
@@ -128,11 +130,16 @@ def xlsread(filename, xlsrange, sheet=0, read_by_column=True,
                     data.append(value)
                 else:
                     data.append(None)
-
+    non_digit_flag = False
     if keep_format:
         data = _convert_to_matrix(data, len(rows))
 
-    if output_format == "numpy":
+    if output_format == "numpy" and not non_digit_flag:
         data = np.array(data, dtype=np.float)
+        if keep_format:
+            data = np.reshape(data, (range_values[-1], range_values[-2] + 1),
+                              order='F')
+
+
 
     return data
